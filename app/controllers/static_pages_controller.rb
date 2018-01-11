@@ -14,5 +14,6 @@ class StaticPagesController < ApplicationController
   def full_title
   end
   
+
   
 end
