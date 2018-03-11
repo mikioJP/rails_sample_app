@@ -1,7 +1,12 @@
 <%= provide(:title, 'All users')%>
 <h1>All users</h1>
 
-<%= will_paginate %>
+<%= form_tag(users_path,method: :get, class: "search_form", remote: true)  do %>
+    <%= text_field_tag :search%>
+    <div><%= submit_tag("Search")%></div>
+<%end%>
+
+<div class = "pagination_links"><%= will_paginate %></div>
 
 <ul class = "users">
     <%= render @users %>

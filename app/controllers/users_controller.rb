@@ -5,7 +5,11 @@ class UsersController < ApplicationController
    
    
   def index
-    @users = User.where(activated: true).paginate(page: params[:page])
+    @users = User.paginate(page: params[:page]).where(activated: true).search(params[:search])
+    respond_to do |format|
+      format.html
+      format.js
+    end
   end
   
   
@@ -66,8 +70,6 @@ class UsersController < ApplicationController
     @users = @user.followers.paginate(page: params[:page])
     render 'show_follow'
   end
-  
-  
   
   private
   
