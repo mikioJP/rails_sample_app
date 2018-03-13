@@ -279,6 +279,11 @@ input {
         padding: 5px 0;
       }
   }
+  
+  .favorited_at{
+    color: $gray-light;
+  }
+  
   .timestamp{
     color: $gray-light;
     display: block;
@@ -288,6 +293,7 @@ input {
     float: left;
     margin-right: 10px;
     margin-top: 5px;
+    margin-bottom: 5px;
   }
 }
 

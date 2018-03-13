@@ -1,14 +1,26 @@
 class User < ApplicationRecord
-    has_many :microposts, dependent: :destroy
+  
+   #中間テーブルとのリレーション構築
     has_many :active_relationships, class_name: "Relationship",
                                     foreign_key: "follower_id",
                                     dependent: :destroy
+                                    
     has_many :passive_relationships, class_name: "Relationship",
                                     foreign_key: "followed_id",
                                     dependent: :destroy
-                    
+
+    
+     #目標テーブルとのリレーション構築                
     has_many :following, through: :active_relationships, source: :followed
     has_many :followers, through: :passive_relationships, source: :follower
+    has_many :microposts, through: :active_favorites
+    
+    has_many :microposts, dependent: :destroy
+    
+    has_many :active_favorites, class_name: "Favorite",
+                                foreign_key: "user_id",
+                                dependent: :destroy
+                              
                                 
     attr_accessor :remember_token, :activation_token, :reset_token
     before_save :downcase_email
@@ -73,7 +85,8 @@ class User < ApplicationRecord
   
   def feed
     following_ids = "SELECT followed_id FROM relationships WHERE follower_id = :user_id"
-    Micropost.where("user_id IN (#{following_ids}) OR user_id = :user_id",  user_id: id)
+    favorite_micropost_ids = "SELECT micropost_id FROM favorites WHERE user_id = :user_id"
+    Micropost.where("user_id IN (#{following_ids}) OR user_id = :user_id OR id IN (#{favorite_micropost_ids})",  user_id: id)
   end
   
   def follow(other_user)
@@ -89,9 +102,20 @@ class User < ApplicationRecord
   end
   
   #search users
+  #検索語が空なら全員表示
   def self.search(search)
     !!search ? where('name LIKE(?)', "%#{search}%") : all
   end
+  
+  #favorite microposts
+  def favorite(micropost)
+    active_favorites.create(micropost_id: micropost.id)
+  end
+  
+  def cancel_favorite(micropost)
+    active_favorites.find_by(micropost_id: micropost.id).destroy
+  end
+  
   
   
   
